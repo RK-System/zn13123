@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deputado Federal João Nunes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos Gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            margin: 40px 0 20px;
+            color: #00a859; /* MODIFICADO: Azul para Verde */
+            position: relative;
+        }
+        h2::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #cc0000; /* MODIFICADO: Verde para Vermelho */
+            margin: 8px auto 0;
+        }
+
+        /* Topo / Header */
+        header {
+            background: linear-gradient(135deg, #00a859 0%, #006633 100%); /* MODIFICADO: Tons de Azul para Tons de Verde */
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+            border-bottom: 5px solid #cc0000; /* MODIFICADO: Verde para Vermelho */
+        }
+        .foto-perfil {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+        header p {
+            font-size: 1.2rem;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+
+        /* Carrosséis */
+        .carrossel-container {
+            overflow-x: auto;
+            display: flex;
+            gap: 20px;
+            padding: 20px 10px;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+        }
+        .carrossel-item {
+            min-width: 250px;
+            max-width: 250px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .carrossel-item:hover {
+            transform: translateY(-5px);
+        }
+        .carrossel-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        /* Ajuste na miniatura do vídeo dentro do carrossel */
+        .carrossel-item .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            position: relative;
+        }
+        .carrossel-item .video-thumbnail i {
+            transition: transform 0.3s;
+            z-index: 2;
+        }
+        .carrossel-item :hover .video-thumbnail i {
+            transform: scale(1.2);
+            color: #ffcc00;
+        }
+
+        /* Pop-ups / Modais */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            text-align: center;
+            animation: entrada 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* Modal exclusivo para o player de Vídeo */
+        .modal-video-content {
+            background: #000;
+            padding: 0;
+            border-radius: 12px;
+            max-width: 800px; /* Vídeo maior na tela */
+            width: 100%;
+            position: relative;
+            animation: entrada 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .modal-video-content video {
+            width: 100%;
+            display: block;
+            max-height: 80vh;
+        }
+
+        /* Elemento que carrega a imagem de fundo clareada */
+        .modal-bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: 1;
+        }
+
+        .modal-content h3, 
+        .modal-content p {
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes entrada {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #666;
+            z-index: 3;
+        }
+        .close-btn:hover { color: #000; }
+        
+        /* Botão fechar específico para o vídeo (fundo escuro requer botão claro) */
+        .close-video-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 35px;
+            cursor: pointer;
+            color: #fff;
+            z-index: 10;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .close-video-btn:hover { color: #ffcc00; }
+
+        /* Depoimentos */
+        .depoimentos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .card-depoimento {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            position: relative;
+        }
+        .foto-depoimento {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 3px solid #cc0000;
+        }
+        .card-depoimento p {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .like-btn {
+            background: none;
+            border: none;
+            color: #e0245e;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+        }
+
+        /* Redes Sociais */
+        .redes-sociais {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+        }
+        .rede-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+        .rede-icon:hover { transform: scale(1.1); }
+        .whatsapp { background-color: #25D366; }
+        .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .facebook { background-color: #1877F2; }
+        .youtube { background-color: #FF0000; }
+
+        /* Localização e QR Code */
+        .info-finais {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .mapa-container iframe {
+            width: 100%;
+            height: 300px;
+            border: 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .qrcode-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .qrcode-container img {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 15px;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: #222;
+            color: #aaa;
+            text-align: center;
+            padding: 25px 20px;
+            margin-top: 60px;
+            font-size: 0.9rem;
+            border-top: 4px solid #ffcc00;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="zn1.jpeg" alt="Deputado João Nunes" class="foto-perfil">
+        <h1>Zé Neto</h1>
+        <p>Deputado Federal<br>13123</p>
+    </header>
+
+    <div class="container">
+
+        <h2>Atividades em Destaque</h2>
+        <div id="carrosselImagens" class="carrossel-container">
+            <div class="carrossel-item" onclick="abrirModal('Visita ao inicio das obras do novo Hospital do Cancer em Feira de Santana/Ba.', 'obra1.jpeg')">
+                <img src="obra1.jpeg" alt="Atividade 1">
+            </div>
+            <div class="carrossel-item" onclick="abrirModal('Visita técnica às obras de infraestrutura no centro de Feira de Santana.', 'obra2.jpeg')">
+                <img src="obra2.jpeg" alt="Atividade 2">
+            </div>
+            <div class="carrossel-item" onclick="abrirModal('Entrega de novos equipamentos agrícolas para a região metropolitana.', 'obra3.jpeg')">
+                <img src="obra3.jpeg" alt="Atividade 3">
+            </div>
+            <div class="carrossel-item" onclick="abrirModal('Sessão plenária debatendo o orçamento para a educação básica.', 'obra4.jpeg')">
+                <img src="obra4.jpeg" alt="Atividade 4">
+            </div>
+            <div class="carrossel-item" onclick="abrirModal('Encontro com lideranças comunitárias no bairro Cidade Nova.', 'obra5.jpeg')">
+                <img src="obra5.jpeg" alt="Atividade 5">
+            </div>
+            <div class="carrossel-item" onclick="abrirModal('Entrevista coletiva detalhando o plano de segurança regional.', 'obra6.jpeg')">
+                <img src="obra6.jpeg" alt="Atividade 6">
+            </div>
+            <div class="carrossel-item" onclick="abrirModal('Apoio aos projetos culturais e incentivo aos jovens artistas.', 'obra7.jpeg')">
+                <img src="obra7.jpeg" alt="Atividade 7">
+            </div>
+            <div class="carrossel-item" onclick="abrirModal('Alinhamento de metas com a bancada federal em Brasília.', 'obra8.jpeg')">
+                <img src="obra8.jpeg" alt="Atividade 8">
+            </div>
+        </div>
+
+        <h2>Galeria de Vídeos</h2>
+        <div id="carrosselVideos" class="carrossel-container">
+            <div class="carrossel-item" onclick="abrirModalVideo('video1.mp4')">
+                <div class="video-thumbnail"><i class="fa-solid fa-circle-play"></i></div>
+            </div>
+            <div class="carrossel-item" onclick="abrirModalVideo('video2.mp4')">
+                <div class="video-thumbnail"><i class="fa-solid fa-circle-play"></i></div>
+            </div>
+            <div class="carrossel-item" onclick="abrirModalVideo('video3.mp4')">
+                <div class="video-thumbnail"><i class="fa-solid fa-circle-play"></i></div>
+            </div>
+            <div class="carrossel-item" onclick="abrirModalVideo('video4.mp4')">
+                <div class="video-thumbnail"><i class="fa-solid fa-circle-play"></i></div>
+            </div>
+            <div class="carrossel-item" onclick="abrirModalVideo('video5.mp4')">
+                <div class="video-thumbnail"><i class="fa-solid fa-circle-play"></i></div>
+            </div>
+            <div class="carrossel-item" onclick="abrirModalVideo('video6.mp4')">
+                <div class="video-thumbnail"><i class="fa-solid fa-circle-play"></i></div>
+            </div>
+            <div class="carrossel-item" onclick="abrirModalVideo('video7.mp4')">
+                <div class="video-thumbnail"><i class="fa-solid fa-circle-play"></i></div>
+            </div>
+            <div class="carrossel-item" onclick="abrirModalVideo('video8.mp4')">
+                <div class="video-thumbnail"><i class="fa-solid fa-circle-play"></i></div>
+            </div>
+        </div>
+
+        <h2>A Voz da População</h2>
+        <div class="depoimentos-grid">
+            <div class="card-depoimento">
+                <img src="https://via.placeholder.com/80" alt="Eleitor 1" class="foto-depoimento">
+                <h3>Maria Silva</h3>
+                <p>"Muito orgulho do trabalho feito pela saúde da nossa cidade!"</p>
+                <button class="like-btn" onclick="computarCurtida(this)"><i class="fa-solid fa-heart"></i> <span>12</span></button>
+            </div>
+            <div class="card-depoimento">
+                <img src="https://via.placeholder.com/80" alt="Eleitor 2" class="foto-depoimento">
+                <h3>Carlos Andrade</h3>
+                <p>"Sempre presente nos bairros escutando as nossas reais necessidades."</p>
+                <button class="like-btn" onclick="computarCurtida(this)"><i class="fa-solid fa-heart"></i> <span>45</span></button>
+            </div>
+            <div class="card-depoimento">
+                <img src="https://via.placeholder.com/80" alt="Eleitor 3" class="foto-depoimento">
+                <h3>Ana Souza</h3>
+                <p>"As emendas destinadas mudaram a realidade da nossa escola local."</p>
+                <button class="like-btn" onclick="computarCurtida(this)"><i class="fa-solid fa-heart"></i> <span>31</span></button>
+            </div>
+        </div>
+
+        <h2>Redes Sociais</h2>
+        <div class="redes-sociais">
+            <a href="https://wa.me/seu-numero" target="_blank" class="rede-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://instagram.com" target="_blank" class="rede-icon instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://facebook.com" target="_blank" class="rede-icon facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://youtube.com" target="_blank" class="rede-icon youtube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+
+        <div class="info-finais">
+            <div class="mapa-container">
+                <h3>Nosso Escritório</h3>
+                <p style="margin-bottom: 10px; font-size: 0.9rem; color:#666;">Rua Domingos Barbosa de Araújo, 363, Centro - Feira de Santana - BA</p>
+                <iframe src="https://maps.google.com/maps?q=Rua%20Domingos%20Barbosa%20de%20Ara%C3%BAjo,%20363%20centro%20Feira%20de%20Santana%20Bahia&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+            </div>
+
+            <div class="qrcode-container">
+                <h3>Acesse Nosso Site</h3>
+                <p style="margin-bottom: 15px; font-size: 0.9rem; color:#666;">Aponte a câmera do celular para acessar</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://zn13123.com" alt="QR Code do Site">
+                <a href="https://zn13123.com" target="_blank" style="color: #00a859; font-weight: bold; text-decoration: none;">zn13123.com</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="meuModal" class="modal">
+        <div class="modal-content">
+            <div id="modalBg" class="modal-bg-image"></div>
+            <span class="close-btn" onclick="fecharModal()">×</span>
+            <h3>Detalhes da Atividade</h3>
+            <p id="textoModal" style="margin-top: 20px; font-size: 1.15rem; color: #111; font-weight: 500;"></p>
+        </div>
+    </div>
+
+    <div id="modalVideo" class="modal">
+        <div class="modal-video-content">
+            <span class="close-video-btn" onclick="fecharModalVideo()">×</span>
+            <video id="playerVideoModal" controls autoplay></video>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 João Nunes. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Variável de controle global para pausar os carrosséis
+        let travadoPorPopup = false;
+
+        // Controle do Modal de Atividades
+        function abrirModal(texto, urlImagem) {
+            travadoPorPopup = true;
+            document.getElementById('textoModal').innerText = texto;
+            document.getElementById('modalBg').style.backgroundImage = "url('" + urlImagem + "')";
+            document.getElementById('meuModal').style.display = 'flex';
+        }
+
+        function fecharModal() {
+            travadoPorPopup = false;
+            document.getElementById('meuModal').style.display = 'none';
+        }
+
+        // NOVO: Controle do Modal de Vídeos
+        function abrirModalVideo(urlVideo) {
+            travadoPorPopup = true;
+            const videoPlayer = document.getElementById('playerVideoModal');
+            videoPlayer.src = urlVideo;
+            document.getElementById('modalVideo').style.display = 'flex';
+            videoPlayer.play(); // Inicia o vídeo imediatamente
+        }
+
+        function fecharModalVideo() {
+            travadoPorPopup = false;
+            const videoPlayer = document.getElementById('playerVideoModal');
+            videoPlayer.pause(); // Pausa o vídeo imediatamente
+            videoPlayer.src = ""; // Reseta o arquivo carregado
+            document.getElementById('modalVideo').style.display = 'none';
+        }
+
+        // Fecha os modais ao clicar fora da caixa de conteúdo
+        window.onclick = function(event) {
+            let modalAtividade = document.getElementById('meuModal');
+            let modalVideo = document.getElementById('modalVideo');
+            
+            if (event.target == modalAtividade) {
+                fecharModal();
+            }
+            if (event.target == modalVideo) {
+                fecharModalVideo();
+            }
+        }
+
+        function computarCurtida(botao) {
+            let contador = botao.querySelector('span');
+            let numeroAtual = parseInt(contador.innerText);
+            contador.innerText = numeroAtual + 1;
+            botao.style.transform = "scale(1.2)";
+            setTimeout(() => { botao.style.transform = "scale(1)"; }, 200);
+        }
+
+        // --- SISTEMA DE ROLAGEM AUTOMÁTICA (AUTO-SCROLL) ---
+        function configurarAutoScroll(idCarrossel, velocidadeMili) {
+            const carrossel = document.getElementById(idCarrossel);
+            let mousePorCima = false;
+
+            carrossel.addEventListener('mouseenter', () => mousePorCima = true);
+            carrossel.addEventListener('mouseleave', () => mousePorCima = false);
+
+            setInterval(() => {
+                // SÓ roda se nenhum popup estiver aberto e o mouse não estiver em cima
+                if (!travadoPorPopup && !mousePorCima) {
+                    const larguraItem = 270; // 250px + 20px gap
+                    
+                    if (carrossel.scrollLeft >= (carrossel.scrollWidth - carrossel.clientWidth - 10)) {
+                        carrossel.scrollLeft = 0;
+                    } else {
+                        carrossel.scrollLeft += larguraItem;
+                    }
+                }
+            }, velocidadeMili);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            configurarAutoScroll('carrosselImagens', 3000); // 3 segundos
+            configurarAutoScroll('carrosselVideos', 4000);  // 4 segundos
+        });
+    </script>
+</body>
+</html>
